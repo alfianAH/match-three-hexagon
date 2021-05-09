@@ -1,53 +1,28 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class TileController : MonoBehaviour
 {
-    [Header("Board")] 
-    public Vector2Int size;
-    public Vector2 offsetTile;
-    public Vector2 offsetBoard;
+    public int id;
 
-    [Header("Tile")] 
-    public List<Sprite> tileTypes = new List<Sprite>();
-    public GameObject tilePrefab;
+    private BoardManager board;
+    private SpriteRenderer spriteRenderer;
 
-    private Vector2 startPosition,
-        endPosition;
-    private TileController[,] tiles;
-
-    private void Start()
+    private void Awake()
     {
-        Vector2 tileSize = tilePrefab.GetComponent<SpriteRenderer>().size;
-        CreateBoard(tileSize);
+        board = BoardManager.Instance;
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
-    
+
     /// <summary>
-    /// Create board for the game
+    /// Set tile's ID, sprite, and name
     /// </summary>
-    /// <param name="tileSize">Tile prefab's size</param>
-    private void CreateBoard(Vector2 tileSize)
+    /// <param name="id">Tile's ID</param>
+    /// <param name="x">Tile's X axis</param>
+    /// <param name="y">Tile's Y axis</param>
+    public void ChangeId(int id, int x, int y)
     {
-        tiles = new TileController[size.x, size.y];
-
-        Vector2 totalSize = (tileSize + offsetTile) * (size - Vector2Int.one);
-
-        startPosition = (Vector2) transform.position - totalSize / 2 + offsetBoard;
-        endPosition = startPosition + totalSize;
-
-        for (int x = 0; x < size.x; x++)
-        {
-            for (int y = 0; y < size.y; y++)
-            {
-                TileController newTile = Instantiate(tilePrefab,
-                    new Vector2(startPosition.x + ((tileSize.x + offsetTile.x) * x),
-                        startPosition.y + ((tileSize.y + offsetTile.y) * y)),
-                    tilePrefab.transform.rotation,
-                    transform
-                    ).GetComponent<TileController>();
-
-                tiles[x, y] = newTile;
-            }
-        }
+        spriteRenderer.sprite = board.tileTypes[id];
+        this.id = id;
+        name = $"TILE_{id}({x},{y})";
     }
 }
