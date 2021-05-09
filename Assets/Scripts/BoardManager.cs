@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class BoardManager : MonoBehaviour
 {
@@ -15,7 +18,11 @@ public class BoardManager : MonoBehaviour
     private Vector2 startPosition,
         endPosition;
     private TileController[,] tiles;
-    
+
+    public bool IsAnimating => IsSwapping;
+
+    public bool IsSwapping { get; set; }
+
     #region Singleton
 
     private static BoardManager instance;
@@ -37,11 +44,95 @@ public class BoardManager : MonoBehaviour
     }
 
     #endregion
+
+    #region Swapping
+    
+    /// <summary>
+    /// Swap Tile A and Tile B
+    /// </summary>
+    /// <param name="a">Tile A</param>
+    /// <param name="b">Tile B</param>
+    /// <param name="onCompleted">Action on completed</param>
+    /// <returns></returns>
+    public IEnumerator SwapTilePosition(TileController a, TileController b, Action onCompleted)
+    {
+        IsSwapping = true;
+
+        Vector2Int indexA = GetTileIndex(a);
+        Vector2Int indexB = GetTileIndex(b);
+        
+        tiles[indexA.x, indexA.y] = b;
+        tiles[indexB.x, indexB.y] = a;
+        
+        // Change Tile A and B's ID
+        a.ChangeId(a.id, indexB.x, indexB.y);
+        b.ChangeId(b.id, indexA.x, indexA.y);
+
+        bool isRoutineACompleted = false;
+        bool isRoutineBCompleted = false;
+        
+        // Start moving the tile with coroutine
+        StartCoroutine(a.MoveTilePosition(
+            GetIndexPosition(indexB), () =>
+            {
+                isRoutineACompleted = true;
+            }));
+        StartCoroutine(b.MoveTilePosition(
+            GetIndexPosition(indexA), () =>
+            {
+                isRoutineBCompleted = true;
+            }));
+        
+        // Wait until Tile A and B 
+        yield return new WaitUntil(() => 
+            isRoutineACompleted && isRoutineBCompleted);
+        
+        onCompleted?.Invoke();
+        IsSwapping = false;
+    }
+
+    #endregion
     
     private void Start()
     {
         Vector2 tileSize = tilePrefab.GetComponent<SpriteRenderer>().size;
         CreateBoard(tileSize);
+    }
+    
+    /// <summary>
+    /// Get tile's index
+    /// </summary>
+    /// <param name="tile"></param>
+    /// <returns>
+    /// Get tile's index 
+    /// Default: (-1, -1)
+    /// </returns>
+    public Vector2Int GetTileIndex(TileController tile)
+    {
+        for (int x = 0; x < size.x; x++)
+        {
+            for (int y = 0; y < size.y; y++)
+            {
+                if(tile == tiles[x, y]) return new Vector2Int(x, y);
+            }
+        }
+        
+        return new Vector2Int(-1, -1);
+    }
+    
+    /// <summary>
+    /// Convert tile's index to position
+    /// </summary>
+    /// <param name="index"></param>
+    /// <returns>
+    /// Get tile's posiion in its index
+    /// </returns>
+    public Vector2 GetIndexPosition(Vector2Int index)
+    {
+        Vector2 tileSize = tilePrefab.GetComponent<SpriteRenderer>().size;
+        
+        return new Vector2(startPosition.x + (tileSize.x + offsetTile.x) * index.x,
+            startPosition.y + (tileSize.y + offsetTile.y) * index.y);
     }
     
     /// <summary>

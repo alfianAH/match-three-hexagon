@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections;
+using UnityEngine;
 
 public class TileController : MonoBehaviour
 {
@@ -13,7 +15,8 @@ public class TileController : MonoBehaviour
     private static TileController previousSelected;
 
     private bool isSelected;
-
+    private static readonly float MoveDuration = 0.5f;
+    
     private void Awake()
     {
         board = BoardManager.Instance;
@@ -40,10 +43,27 @@ public class TileController : MonoBehaviour
             }
             else  // If there is one, ...
             {
-                previousSelected.Deselect(); // Deselect the previous one
-                Select(); // Select the new one
+                TileController otherTile = previousSelected;
+                // Swap tile
+                SwapTile(otherTile, () =>
+                {
+                    SwapTile(otherTile);
+                });
+                
+                // previousSelected.Deselect(); // Deselect the previous one
+                // Select(); // Select the new one
             }
         }
+    }
+    
+    /// <summary>
+    /// Swap tile with other tile
+    /// </summary>
+    /// <param name="otherTile"></param>
+    /// <param name="onCompleted"></param>
+    public void SwapTile(TileController otherTile, Action onCompleted = null)
+    {
+        StartCoroutine(board.SwapTilePosition(this, otherTile, onCompleted));
     }
 
     /// <summary>
@@ -57,6 +77,28 @@ public class TileController : MonoBehaviour
         spriteRenderer.sprite = board.tileTypes[id];
         this.id = id;
         name = $"TILE_{id}({x},{y})";
+    }
+
+    public IEnumerator MoveTilePosition(Vector2 targetPosition, Action onCompleted)
+    {
+        Vector2 startPosition = transform.position;
+        float time = 0f;
+        
+        // Run animation on next frame for safety reason
+        yield return new WaitForEndOfFrame();
+
+        while (time < MoveDuration)
+        {
+            transform.position = Vector2.Lerp(startPosition, targetPosition, time / MoveDuration);
+
+            time += Time.deltaTime;
+            
+            yield return new WaitForEndOfFrame();
+        }
+
+        transform.position = targetPosition;
+        
+        onCompleted.Invoke();
     }
 
     #region Select & Deselect
