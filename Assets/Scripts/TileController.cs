@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class TileController : MonoBehaviour
@@ -13,7 +14,7 @@ public class TileController : MonoBehaviour
     private static readonly Color NormalColor = Color.white;
 
     private static TileController previousSelected;
-
+    
     private bool isSelected;
     private static readonly float MoveDuration = 0.5f;
     
@@ -43,15 +44,18 @@ public class TileController : MonoBehaviour
             }
             else  // If there is one, ...
             {
-                TileController otherTile = previousSelected;
-                // Swap tile
-                SwapTile(otherTile, () =>
+                // If previous selected is in adjacent tiles, ...
+                if(GetAllAdjacentTiles().Contains(previousSelected))
                 {
-                    SwapTile(otherTile);
-                });
-                
-                // previousSelected.Deselect(); // Deselect the previous one
-                // Select(); // Select the new one
+                    TileController otherTile = previousSelected;
+                    // Swap tile
+                    SwapTile(otherTile, () => { SwapTile(otherTile); });
+                } 
+                else // If not on adjacent tiles, ...
+                {
+                    previousSelected.Deselect(); // Deselect the previous one
+                    Select(); // Select the new one
+                }
             }
         }
     }
@@ -59,8 +63,8 @@ public class TileController : MonoBehaviour
     /// <summary>
     /// Swap tile with other tile
     /// </summary>
-    /// <param name="otherTile"></param>
-    /// <param name="onCompleted"></param>
+    /// <param name="otherTile">Other selected tile</param>
+    /// <param name="onCompleted">Action on completed</param>
     public void SwapTile(TileController otherTile, Action onCompleted = null)
     {
         StartCoroutine(board.SwapTilePosition(this, otherTile, onCompleted));
@@ -78,7 +82,13 @@ public class TileController : MonoBehaviour
         this.id = id;
         name = $"TILE_{id}({x},{y})";
     }
-
+    
+    /// <summary>
+    /// Move tile's position to target position
+    /// </summary>
+    /// <param name="targetPosition">Target position</param>
+    /// <param name="onCompleted">Action on completed</param>
+    /// <returns></returns>
     public IEnumerator MoveTilePosition(Vector2 targetPosition, Action onCompleted)
     {
         Vector2 startPosition = transform.position;
@@ -101,6 +111,52 @@ public class TileController : MonoBehaviour
         onCompleted.Invoke();
     }
 
+    #region Adjacent
+    
+    private static readonly Vector2[] AdjacentDirection = {
+        Vector2.up, Vector2.down, Vector2.left, Vector2.right
+    };
+    
+    /// <summary>
+    /// Get adjacent tile
+    /// </summary>
+    /// <param name="raycastDir">Raycast direction</param>
+    /// <returns>
+    /// Tile that hit by raycast 
+    /// </returns>
+    private TileController GetAdjacent(Vector2 raycastDir)
+    {
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, raycastDir, spriteRenderer.size.x);
+        
+        // If hit, return tile
+        if (hit)
+        {
+            return hit.collider.GetComponent<TileController>();
+        }
+
+        return null;
+    }
+    
+    /// <summary>
+    /// Get all adjacent tiles that are on top, bottom, left, right
+    /// </summary>
+    /// <returns>
+    /// Tiles that are on top, bottom, left, right
+    /// </returns>
+    public List<TileController> GetAllAdjacentTiles()
+    {
+        List<TileController> adjacentTiles = new List<TileController>();
+
+        foreach (Vector2 adjacentDirection in AdjacentDirection)
+        {
+            adjacentTiles.Add(GetAdjacent(adjacentDirection));
+        }
+
+        return adjacentTiles;
+    }
+
+    #endregion
+    
     #region Select & Deselect
 
     /// <summary>
