@@ -213,7 +213,7 @@ public class BoardManager : MonoBehaviour
     {
         List<TileController> destroyedTiles = GetAllDestroyed();
 
-        // StartCoroutine(DestroyAndFillTiles(destroyedTiles, ProcessReposition));
+        StartCoroutine(DestroyAndFillTiles(destroyedTiles, ProcessReposition));
     }
     
     /// <summary>
@@ -262,6 +262,48 @@ public class BoardManager : MonoBehaviour
         yield return null;
         
         onCompleted?.Invoke();
+    }
+
+    #endregion
+
+    #region Reposition
+
+    private void ProcessReposition()
+    {
+        StartCoroutine(RepositionTiles(ProcessMatches));
+    }
+
+    private IEnumerator RepositionTiles(Action onComplete)
+    {
+        List<bool> isCompleted = new List<bool>();
+
+        int i = 0;
+
+        for (int x = 0; x < size.x; x++)
+        {
+            for (int y = 0; y < size.y; y++)
+            {
+                Vector2 targetPosition = GetIndexPosition(new Vector2Int(x, y));
+                
+                // Skip if already on position
+                if ((Vector2) tiles[x, y].transform.position == targetPosition) 
+                    continue;
+                
+                isCompleted.Add(false);
+
+                int index = i;
+                StartCoroutine(tiles[x, y].MoveTilePosition(targetPosition, () =>
+                {
+                    isCompleted[index] = true;
+                }));
+
+                i++;
+            }
+        }
+
+        yield return new WaitUntil(() => IsAllTrue(isCompleted));
+        
+        onComplete?.Invoke();
     }
 
     #endregion
