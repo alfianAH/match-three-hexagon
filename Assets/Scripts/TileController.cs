@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class TileController : MonoBehaviour
 {
@@ -17,13 +18,24 @@ public class TileController : MonoBehaviour
     
     private bool isSelected;
     private static readonly float MoveDuration = 0.5f;
-    
+    private static readonly float DestroyBigDuration = 0.1f;
+    private static readonly float DestroySmallDuration = 0.4f;
+
+    private static readonly Vector2 SizeBig = Vector2.one * 1.2f;
+    private static readonly Vector2 SizeSmall = Vector2.zero;
+    private static readonly Vector2 SizeNormal = Vector2.one;
+
     public bool IsDestroyed { get; private set; }
     
     private void Awake()
     {
         board = BoardManager.Instance;
         spriteRenderer = GetComponent<SpriteRenderer>();
+    }
+
+    private void Start()
+    {
+        IsDestroyed = false;
     }
 
     private void OnMouseDown()
@@ -56,6 +68,7 @@ public class TileController : MonoBehaviour
                         if (board.GetAllMatches().Count > 0)
                         {
                             Debug.Log("MATCH FOUND");
+                            board.Process();
                         }
                         else
                         {
@@ -96,6 +109,18 @@ public class TileController : MonoBehaviour
     }
     
     /// <summary>
+    /// Generate random tile
+    /// </summary>
+    /// <param name="x">Axis X</param>
+    /// <param name="y">Axis Y</param>
+    public void GenerateRandomTile(int x, int y)
+    {
+        transform.localScale = SizeNormal;
+        IsDestroyed = false;
+        ChangeId(Random.Range(0, board.tileTypes.Count), x, y);
+    }
+    
+    /// <summary>
     /// Move tile's position to target position
     /// </summary>
     /// <param name="targetPosition">Target position</param>
@@ -121,6 +146,44 @@ public class TileController : MonoBehaviour
         transform.position = targetPosition;
         
         onCompleted.Invoke();
+    }
+
+    public IEnumerator SetDestroyed(Action onCompleted)
+    {
+        IsDestroyed = true;
+        id = -1;
+        name = "TILE_NULL";
+
+        Vector2 startSize = transform.localScale;
+        float time = 0.0f;
+
+        while (time < DestroyBigDuration)
+        {
+            transform.localScale = Vector2.Lerp(startSize, SizeBig, time / DestroyBigDuration);
+
+            time += Time.deltaTime;
+            
+            yield return new WaitForEndOfFrame();
+        }
+
+        transform.localScale = SizeBig;
+        
+        startSize = transform.localScale;
+        time = 0.0f;
+
+        while (time < DestroyBigDuration)
+        {
+            transform.localScale = Vector2.Lerp(startSize, SizeSmall, time / DestroySmallDuration);
+
+            time += Time.deltaTime;
+            
+            yield return new WaitForEndOfFrame();
+        }
+
+        transform.localScale = SizeSmall;
+
+        spriteRenderer.sprite = null;
+        onCompleted?.Invoke();
     }
 
     #region Adjacent
