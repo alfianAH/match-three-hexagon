@@ -6,17 +6,9 @@ using Random = UnityEngine.Random;
 
 public class TileController : MonoBehaviour
 {
-    public int id;
-    
-    private BoardManager board;
-    private SpriteRenderer spriteRenderer;
-    
     private static readonly Color SelectedColor = new Color(0.5f, 0.5f, 0.5f);
     private static readonly Color NormalColor = Color.white;
-
-    private static TileController previousSelected;
     
-    private bool isSelected;
     private static readonly float MoveDuration = 0.5f;
     private static readonly float DestroyBigDuration = 0.1f;
     private static readonly float DestroySmallDuration = 0.4f;
@@ -24,9 +16,28 @@ public class TileController : MonoBehaviour
     private static readonly Vector2 SizeBig = Vector2.one * 1.2f;
     private static readonly Vector2 SizeSmall = Vector2.zero;
     private static readonly Vector2 SizeNormal = Vector2.one;
+    
+    private static readonly Vector2[] AdjacentDirection = {
+        Vector2.up, Vector2.down, Vector2.left, Vector2.right
+    };
+    
+    private static TileController previousSelected;
+    
+    public int id;
+    
+    private BoardManager board;
+    private SpriteRenderer spriteRenderer;
+    
+    private bool isSelected;
+
+    #region Setter and Getter
 
     public bool IsDestroyed { get; private set; }
-    
+
+    #endregion
+
+    #region MonoBehaviour Methods
+
     private void Awake()
     {
         board = BoardManager.Instance;
@@ -84,16 +95,8 @@ public class TileController : MonoBehaviour
             }
         }
     }
-    
-    /// <summary>
-    /// Swap tile with other tile
-    /// </summary>
-    /// <param name="otherTile">Other selected tile</param>
-    /// <param name="onCompleted">Action on completed</param>
-    public void SwapTile(TileController otherTile, Action onCompleted = null)
-    {
-        StartCoroutine(board.SwapTilePosition(this, otherTile, onCompleted));
-    }
+
+    #endregion
 
     /// <summary>
     /// Set tile's ID, sprite, and name
@@ -107,19 +110,43 @@ public class TileController : MonoBehaviour
         this.id = id;
         name = $"TILE_{id}({x},{y})";
     }
+
+    #region Select & Deselect
+
+    /// <summary>
+    /// Tile's condition when it's selected
+    /// </summary>
+    private void Select()
+    {
+        isSelected = true;
+        spriteRenderer.color = SelectedColor;
+        previousSelected = this;
+    }
+
+    /// <summary>
+    /// Tile's condition when it's deselected
+    /// </summary>
+    private void Deselect()
+    {
+        isSelected = false;
+        spriteRenderer.color = NormalColor;
+        previousSelected = null;
+    }
+
+    #endregion
+    
+    #region Swapping and Moving
     
     /// <summary>
-    /// Generate random tile
+    /// Swap tile with other tile
     /// </summary>
-    /// <param name="x">Axis X</param>
-    /// <param name="y">Axis Y</param>
-    public void GenerateRandomTile(int x, int y)
+    /// <param name="otherTile">Other selected tile</param>
+    /// <param name="onCompleted">Action on completed</param>
+    public void SwapTile(TileController otherTile, Action onCompleted = null)
     {
-        transform.localScale = SizeNormal;
-        IsDestroyed = false;
-        ChangeId(Random.Range(0, board.tileTypes.Count), x, y);
+        StartCoroutine(board.SwapTilePosition(this, otherTile, onCompleted));
     }
-    
+
     /// <summary>
     /// Move tile's position to target position
     /// </summary>
@@ -147,50 +174,10 @@ public class TileController : MonoBehaviour
         
         onCompleted.Invoke();
     }
-
-    public IEnumerator SetDestroyed(Action onCompleted)
-    {
-        IsDestroyed = true;
-        id = -1;
-        name = "TILE_NULL";
-
-        Vector2 startSize = transform.localScale;
-        float time = 0.0f;
-
-        while (time < DestroyBigDuration)
-        {
-            transform.localScale = Vector2.Lerp(startSize, SizeBig, time / DestroyBigDuration);
-
-            time += Time.deltaTime;
-            
-            yield return new WaitForEndOfFrame();
-        }
-
-        transform.localScale = SizeBig;
-        
-        startSize = transform.localScale;
-        time = 0.0f;
-
-        while (time < DestroyBigDuration)
-        {
-            transform.localScale = Vector2.Lerp(startSize, SizeSmall, time / DestroySmallDuration);
-
-            time += Time.deltaTime;
-            
-            yield return new WaitForEndOfFrame();
-        }
-
-        transform.localScale = SizeSmall;
-
-        spriteRenderer.sprite = null;
-        onCompleted?.Invoke();
-    }
+    
+    #endregion
 
     #region Adjacent
-    
-    private static readonly Vector2[] AdjacentDirection = {
-        Vector2.up, Vector2.down, Vector2.left, Vector2.right
-    };
     
     /// <summary>
     /// Get adjacent tile
@@ -330,28 +317,58 @@ public class TileController : MonoBehaviour
     }
 
     #endregion
+
+    #region Destroy and Generate
+
+    public IEnumerator SetDestroyed(Action onCompleted)
+    {
+        IsDestroyed = true;
+        id = -1;
+        name = "TILE_NULL";
+
+        Vector2 startSize = transform.localScale;
+        float time = 0.0f;
+
+        while (time < DestroyBigDuration)
+        {
+            transform.localScale = Vector2.Lerp(startSize, SizeBig, time / DestroyBigDuration);
+
+            time += Time.deltaTime;
+            
+            yield return new WaitForEndOfFrame();
+        }
+
+        transform.localScale = SizeBig;
+        
+        startSize = transform.localScale;
+        time = 0.0f;
+
+        while (time < DestroyBigDuration)
+        {
+            transform.localScale = Vector2.Lerp(startSize, SizeSmall, time / DestroySmallDuration);
+
+            time += Time.deltaTime;
+            
+            yield return new WaitForEndOfFrame();
+        }
+
+        transform.localScale = SizeSmall;
+
+        spriteRenderer.sprite = null;
+        onCompleted?.Invoke();
+    }
+
+    /// <summary>
+    /// Generate random tile
+    /// </summary>
+    /// <param name="x">Axis X</param>
+    /// <param name="y">Axis Y</param>
+    public void GenerateRandomTile(int x, int y)
+    {
+        transform.localScale = SizeNormal;
+        IsDestroyed = false;
+        ChangeId(Random.Range(0, board.tileTypes.Count), x, y);
+    }
     
-    #region Select & Deselect
-
-    /// <summary>
-    /// Tile's condition when it's selected
-    /// </summary>
-    private void Select()
-    {
-        isSelected = true;
-        spriteRenderer.color = SelectedColor;
-        previousSelected = this;
-    }
-
-    /// <summary>
-    /// Tile's condition when it's deselected
-    /// </summary>
-    private void Deselect()
-    {
-        isSelected = false;
-        spriteRenderer.color = NormalColor;
-        previousSelected = null;
-    }
-
     #endregion
 }
