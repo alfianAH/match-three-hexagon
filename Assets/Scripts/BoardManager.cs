@@ -100,6 +100,39 @@ public class BoardManager : MonoBehaviour
     }
     
     /// <summary>
+    /// Check all tiles if there are any matching tiles
+    /// </summary>
+    /// <returns>
+    /// All matching tiles in horizontal or vertical
+    /// </returns>
+    public List<TileController> GetAllMatches()
+    {
+        List<TileController> matchingTiles = new List<TileController>();
+
+        for (int x = 0; x < size.x; x++)
+        {
+            for (int y = 0; y < size.y; y++)
+            {
+                List<TileController> tileMatched = tiles[x, y].GetAllMatches();
+                
+                // Go to next tile if no match
+                if(tileMatched == null || tileMatched.Count == 0) continue;
+
+                foreach (TileController tile in tileMatched)
+                {
+                    // Add the one that isn't added yet
+                    if (!matchingTiles.Contains(tile))
+                    {
+                        matchingTiles.Add(tile);
+                    }
+                }
+            }
+        }
+
+        return matchingTiles;
+    }
+    
+    /// <summary>
     /// Get tile's index
     /// </summary>
     /// <param name="tile"></param>

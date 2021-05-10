@@ -6,7 +6,7 @@ using UnityEngine;
 public class TileController : MonoBehaviour
 {
     public int id;
-
+    
     private BoardManager board;
     private SpriteRenderer spriteRenderer;
     
@@ -17,6 +17,8 @@ public class TileController : MonoBehaviour
     
     private bool isSelected;
     private static readonly float MoveDuration = 0.5f;
+    
+    public bool IsDestroyed { get; private set; }
     
     private void Awake()
     {
@@ -49,7 +51,17 @@ public class TileController : MonoBehaviour
                 {
                     TileController otherTile = previousSelected;
                     // Swap tile
-                    SwapTile(otherTile, () => { SwapTile(otherTile); });
+                    SwapTile(otherTile, () =>
+                    {
+                        if (board.GetAllMatches().Count > 0)
+                        {
+                            Debug.Log("MATCH FOUND");
+                        }
+                        else
+                        {
+                            SwapTile(otherTile);
+                        }
+                    });
                 } 
                 else // If not on adjacent tiles, ...
                 {
@@ -153,6 +165,105 @@ public class TileController : MonoBehaviour
         }
 
         return adjacentTiles;
+    }
+
+    #endregion
+
+    #region Check Match
+    
+    /// <summary>
+    /// Get all tiles that match
+    /// </summary>
+    /// <param name="raycastDir">Raycast direction</param>
+    /// <returns></returns>
+    private List<TileController> GetMatch(Vector2 raycastDir)
+    {
+        List<TileController> matchingTiles = new List<TileController>();
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, raycastDir, spriteRenderer.size.x);
+
+        while (hit)
+        {
+            // Get other tile
+            TileController otherTile = hit.collider.GetComponent<TileController>();
+            
+            if (otherTile.id != id || otherTile.IsDestroyed) break;
+            
+            // Add other tile to list
+            matchingTiles.Add(otherTile);
+            // Raycast on other tile
+            hit = Physics2D.Raycast(otherTile.transform.position, raycastDir, spriteRenderer.size.x);
+        }
+
+        return matchingTiles;
+    }
+    
+    /// <summary>
+    /// Get one line match (Vertical or Horizontal)
+    /// </summary>
+    /// <param name="paths">Vector for Vertical or Horizontal</param>
+    /// <returns>
+    /// Match tiles in 1 line
+    /// </returns>
+    private List<TileController> GetOneLineMatch(Vector2[] paths)
+    {
+        List<TileController> matchingTiles = new List<TileController>();
+        
+        foreach (Vector2 path in paths)
+        {
+            // Add match tile to the list
+            matchingTiles.AddRange(GetMatch(path));
+        }
+        
+        // Match if matching tiles are more or equal to 2 (include itself) 
+        if (matchingTiles.Count >= 2)
+        {
+            return matchingTiles;
+        }
+
+        return null;
+    }
+    
+    /// <summary>
+    /// Get all matches in horizontal or vertical
+    /// </summary>
+    /// <returns>
+    /// All match tiles in horizontal or vertical
+    /// </returns>
+    public List<TileController> GetAllMatches()
+    {
+        if (IsDestroyed) return null;
+        
+        List<TileController> matchingTiles = new List<TileController>();
+        
+        // Get matches for horizontal and vertical
+        List<TileController> horizontalMatchingTiles = GetOneLineMatch(new[]
+        {
+            Vector2.up, Vector2.down
+        });
+        
+        List<TileController> verticalMatchingTiles = GetOneLineMatch(new[]
+        {
+            Vector2.left, Vector2.right
+        });
+        
+        // Add matching tiles to the list
+        if (horizontalMatchingTiles != null)
+        {
+            matchingTiles.AddRange(horizontalMatchingTiles);
+        }
+
+        if (verticalMatchingTiles != null)
+        {
+            matchingTiles.AddRange(verticalMatchingTiles);
+        }
+        
+        // Add itself to match tiles if match found
+        if (matchingTiles != null && matchingTiles.Count >= 2)
+        {
+            matchingTiles.Add(this);
+        }
+
+        return matchingTiles;
     }
 
     #endregion
