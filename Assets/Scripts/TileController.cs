@@ -142,7 +142,7 @@ public class TileController : MonoBehaviour
     /// </summary>
     /// <param name="otherTile">Other selected tile</param>
     /// <param name="onCompleted">Action on completed</param>
-    public void SwapTile(TileController otherTile, Action onCompleted = null)
+    private void SwapTile(TileController otherTile, Action onCompleted = null)
     {
         StartCoroutine(board.SwapTilePosition(this, otherTile, onCompleted));
     }
@@ -205,7 +205,7 @@ public class TileController : MonoBehaviour
     /// <returns>
     /// Tiles that are on top, bottom, left, right
     /// </returns>
-    public List<TileController> GetAllAdjacentTiles()
+    private List<TileController> GetAllAdjacentTiles()
     {
         List<TileController> adjacentTiles = new List<TileController>();
 
@@ -308,7 +308,7 @@ public class TileController : MonoBehaviour
         }
         
         // Add itself to match tiles if match found
-        if (matchingTiles != null && matchingTiles.Count >= 2)
+        if (matchingTiles.Count >= 2)
         {
             matchingTiles.Add(this);
         }
@@ -320,6 +320,11 @@ public class TileController : MonoBehaviour
 
     #region Destroy and Generate
 
+    /// <summary>
+    /// Play destroyed tile animation
+    /// </summary>
+    /// <param name="onCompleted">Action on completed</param>
+    /// <returns></returns>
     public IEnumerator SetDestroyed(Action onCompleted)
     {
         IsDestroyed = true;
@@ -328,7 +333,8 @@ public class TileController : MonoBehaviour
 
         Vector2 startSize = transform.localScale;
         float time = 0.0f;
-
+        
+        // Make it bigger
         while (time < DestroyBigDuration)
         {
             transform.localScale = Vector2.Lerp(startSize, SizeBig, time / DestroyBigDuration);
@@ -338,11 +344,13 @@ public class TileController : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
 
-        transform.localScale = SizeBig;
+        Transform tileTransform = transform;
         
-        startSize = transform.localScale;
+        tileTransform.localScale = SizeBig;
+        startSize = tileTransform.localScale;
         time = 0.0f;
-
+        
+        // Make it smaller
         while (time < DestroyBigDuration)
         {
             transform.localScale = Vector2.Lerp(startSize, SizeSmall, time / DestroySmallDuration);
@@ -353,7 +361,8 @@ public class TileController : MonoBehaviour
         }
 
         transform.localScale = SizeSmall;
-
+        
+        // Destroy the tile
         spriteRenderer.sprite = null;
         onCompleted?.Invoke();
     }
