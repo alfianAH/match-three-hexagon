@@ -18,7 +18,7 @@ Project Features:
 1. Go to [Release tab](https://github.com/alfianAH/match-three-hexagon/releases)
 2. Choose between MatchThree_x64.exe or MatchThree_x86.exe. Choose the one that suits your computer/laptop. **Make sure it is the latest version.**
 3. It will automatically download the file to your computer.
-4. After downloading, install it by clicking on file
+4. After downloading, double click the .exe file, it will launch the game. (Because this is the portable version).
 5. Done. You can play it now.
 
 ## How to play
