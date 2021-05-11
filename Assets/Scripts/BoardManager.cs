@@ -41,6 +41,8 @@ public class BoardManager : MonoBehaviour
         endPosition;
     private TileController[,] tiles;
 
+    private int combo;
+
     #region Setter and Getter
 
     public bool IsAnimating => IsProcessing || IsSwapping;
@@ -190,6 +192,7 @@ public class BoardManager : MonoBehaviour
     /// </summary>
     public void Process()
     {
+        combo = 0;
         IsProcessing = true;
         ProcessMatches();
     }
@@ -211,6 +214,10 @@ public class BoardManager : MonoBehaviour
             IsProcessing = false;
             return;
         }
+
+        // Increase score and combo
+        combo++;
+        ScoreManager.Instance.IncrementCurrentScore(matchingTiles.Count, combo);
         
         // Clear matching tiles
         StartCoroutine(ClearMatches(matchingTiles, ProcessDrop));
