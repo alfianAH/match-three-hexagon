@@ -4,7 +4,7 @@ A game where you have to match 3 or more tiles. Destroy it and get more score.
 
 Project Features:
 1. Singleton
-1. Tween (Scripted Animation with )
+1. Tween (Scripted Animation with Coroutine)
 1. Timer
 1. Score
 1. Audio
