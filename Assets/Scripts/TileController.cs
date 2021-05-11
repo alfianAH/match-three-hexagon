@@ -26,6 +26,7 @@ public class TileController : MonoBehaviour
     public int id;
     
     private BoardManager board;
+    private GameFlowManager gameFlowManager;
     private SpriteRenderer spriteRenderer;
     
     private bool isSelected;
@@ -41,6 +42,7 @@ public class TileController : MonoBehaviour
     private void Awake()
     {
         board = BoardManager.Instance;
+        gameFlowManager = GameFlowManager.Instance;
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
@@ -52,7 +54,8 @@ public class TileController : MonoBehaviour
     private void OnMouseDown()
     {
         // Non selectible condition
-        if (spriteRenderer.sprite == null) return;
+        if (spriteRenderer.sprite == null || board.IsAnimating || gameFlowManager.IsGameOver) 
+            return;
         
         // When mouse is clicked on the tile
         // If tile is selected, ...
