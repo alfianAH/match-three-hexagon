@@ -26,6 +26,9 @@ public class GameFlowManager : MonoBehaviour
 
     #endregion
 
+    [Header("UI")] 
+    public UiGameOver gameOverUI;
+
     #region Setter and Getter
 
     public bool IsGameOver { get; private set; }
@@ -44,5 +47,6 @@ public class GameFlowManager : MonoBehaviour
     {
         IsGameOver = true;
         ScoreManager.Instance.SetHighScore();
+        gameOverUI.Show();
     }
 }
