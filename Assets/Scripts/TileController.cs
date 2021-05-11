@@ -57,6 +57,8 @@ public class TileController : MonoBehaviour
         if (spriteRenderer.sprite == null || board.IsAnimating || gameFlowManager.IsGameOver) 
             return;
         
+        SoundManager.Instance.PlayTap();
+        
         // When mouse is clicked on the tile
         // If tile is selected, ...
         if (isSelected)
@@ -81,11 +83,12 @@ public class TileController : MonoBehaviour
                     {
                         if (board.GetAllMatches().Count > 0)
                         {
-                            Debug.Log("MATCH FOUND");
+                            // Match found
                             board.Process();
                         }
                         else
                         {
+                            SoundManager.Instance.PlayWrong();
                             SwapTile(otherTile);
                         }
                     });

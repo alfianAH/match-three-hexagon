@@ -61,7 +61,7 @@ public class ScoreManager : MonoBehaviour
         CurrentScore += (tileCount * tileRatio) * (comboCount * comboRatio);
         
         // Play sound when combo is more than 1
-        // SoundManager.Instance.PlayScore(comboCount > 1);
+        SoundManager.Instance.PlayScore(comboCount > 1);
     }
     
     /// <summary>
