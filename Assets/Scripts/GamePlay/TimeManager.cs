@@ -2,32 +2,8 @@
 
 namespace GamePlay
 {
-    public class TimeManager : MonoBehaviour
+    public class TimeManager : SingletonBaseClass<TimeManager>
     {
-        #region Singleton
-
-        private static TimeManager instance;
-
-        public static TimeManager Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    instance = FindObjectOfType<TimeManager>();
-                
-                    if (instance == null)
-                    {
-                        Debug.LogError("Fatal Error: TimeManager not Found");
-                    }
-                }
-
-                return instance;
-            }
-        }
-
-        #endregion
-
         public int duration;
 
         private float time;
