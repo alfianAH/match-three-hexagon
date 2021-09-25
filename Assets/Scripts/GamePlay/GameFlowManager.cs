@@ -3,32 +3,8 @@ using UnityEngine;
 
 namespace GamePlay
 {
-    public class GameFlowManager : MonoBehaviour
+    public class GameFlowManager : SingletonBaseClass<GameFlowManager>
     {
-        #region Singleton
-
-        private static GameFlowManager instance;
-
-        public static GameFlowManager Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    instance = FindObjectOfType<GameFlowManager>();
-                
-                    if (instance == null)
-                    {
-                        Debug.LogError("Fatal Error: GameFlowManager not Found");
-                    }
-                }
-
-                return instance;
-            }
-        }
-
-        #endregion
-
         [Header("UI")] 
         public UiGameOver gameOverUI;
 
