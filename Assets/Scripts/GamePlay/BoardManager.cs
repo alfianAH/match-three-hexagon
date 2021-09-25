@@ -17,7 +17,7 @@ namespace GamePlay
         [Header("Tile")] 
         public List<Sprite> tileTypes = new List<Sprite>();
         public GameObject tilePrefab;
-    
+
         private Vector2 startPosition,
             endPosition;
         private TileController[,] tiles;
@@ -192,14 +192,17 @@ namespace GamePlay
             // Stop locking if not match found
             if (matchingTiles == null || matchingTiles.Count == 0)
             {
+                ComboManager.Instance.Hide();
                 IsProcessing = false;
                 return;
             }
 
             // Increase score and combo
             combo++;
+            ComboManager.Instance.Show();
+            ComboManager.Instance.uiCombo.UpdateComboText(combo);
             ScoreManager.Instance.IncrementCurrentScore(matchingTiles.Count, combo);
-        
+            
             // Clear matching tiles
             StartCoroutine(ClearMatches(matchingTiles, ProcessDrop));
         }
