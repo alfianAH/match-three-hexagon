@@ -532,6 +532,7 @@ GameObject:
   - component: {fileID: 540062026}
   - component: {fileID: 540062027}
   - component: {fileID: 540062025}
+  - component: {fileID: 540062028}
   m_Layer: 5
   m_Name: Time Panel
   m_TagString: Untagged
@@ -609,6 +610,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   time: {fileID: 1149781507}
+--- !u!95 &540062028
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 540062023}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: fb7ed00649624004bbd89e03e6ae47c8, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &625801116
 GameObject:
   m_ObjectHideFlags: 0
@@ -1093,7 +1113,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4497fe023a2a1494da7a5f9ed8f57fbe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  duration: 10
+  duration: 15
+  timeAnimator: {fileID: 540062028}
 --- !u!1 &1439775775
 GameObject:
   m_ObjectHideFlags: 0
