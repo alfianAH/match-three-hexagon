@@ -1,4 +1,5 @@
-﻿using Score;
+﻿using System;
+using Score;
 using UnityEngine;
 
 namespace GamePlay
@@ -8,11 +9,18 @@ namespace GamePlay
         [Header("UI")] 
         public UiGameOver gameOverUI;
 
+        private BoardManager boardManager;
+
         #region Setter and Getter
 
         public bool IsGameOver { get; private set; }
 
         #endregion
+
+        private void Awake()
+        {
+            boardManager = BoardManager.Instance;
+        }
 
         private void Start()
         {
@@ -24,9 +32,12 @@ namespace GamePlay
         /// </summary>
         public void GameOver()
         {
-            IsGameOver = true;
-            ScoreManager.Instance.SetHighScore();
-            gameOverUI.Show();
+            if(!boardManager.IsAnimating)
+            {
+                IsGameOver = true;
+                ScoreManager.Instance.SetHighScore();
+                gameOverUI.Show();
+            }
         }
     }
 }
