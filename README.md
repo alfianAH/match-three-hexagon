@@ -11,7 +11,7 @@ Project Features:
 
 ## Getting Started
 1. Clone this repository to your computer/laptop
-1. Open it with Unity (Recommended Unity 2019.4.24f1)
+1. Open it with Unity (Recommended Unity 2018.3.3f1)
 1. Play with it.
 
 ## How to Install
@@ -22,7 +22,7 @@ Project Features:
 5. Done. You can play it now.
 
 ## How to play
-1. Combine 3 or more same type of tiles by tapping and choose another tile to swipe
+1. Combine 3 or more same type of tiles by tapping and choose another tile to swap
 1. Enjoy
 
 ## Example game
