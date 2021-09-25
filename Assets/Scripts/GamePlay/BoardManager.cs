@@ -7,30 +7,8 @@ using Random = UnityEngine.Random;
 
 namespace GamePlay
 {
-    public class BoardManager : MonoBehaviour
+    public class BoardManager : SingletonBaseClass<BoardManager>
     {
-        #region Singleton
-
-        private static BoardManager instance;
-
-        public static BoardManager Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    instance = FindObjectOfType<BoardManager>();
-
-                    if (instance == null)
-                        Debug.LogError("BoardManager not Found");
-                }
-
-                return instance;
-            }
-        }
-
-        #endregion
-    
         [Header("Board")] 
         public Vector2Int size;
         public Vector2 offsetTile;
