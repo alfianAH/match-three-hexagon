@@ -1,38 +1,13 @@
 ﻿using Audio;
-using UnityEngine;
 
 namespace Score
 {
-    public class ScoreManager : MonoBehaviour
+    public class ScoreManager : SingletonBaseClass<ScoreManager>
     {
         private static int highScore;
 
         public int tileRatio;
         public int comboRatio;
-
-        #region Singleton
-
-        private static ScoreManager instance;
-
-        public static ScoreManager Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    instance = FindObjectOfType<ScoreManager>();
-
-                    if (instance == null)
-                    {
-                        Debug.LogError("Fatal Error: ScoreManager not Found");
-                    }
-                }
-
-                return instance;
-            }
-        }
-
-        #endregion
 
         #region Setter and Getter
 
