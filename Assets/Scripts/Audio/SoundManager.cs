@@ -2,32 +2,8 @@
 
 namespace Audio
 {
-    public class SoundManager : MonoBehaviour
+    public class SoundManager : SingletonBaseClass<SoundManager>
     {
-        #region Singleton
-
-        private static SoundManager instance;
-
-        public static SoundManager Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    instance = FindObjectOfType<SoundManager>();
-                
-                    if (instance == null)
-                    {
-                        Debug.LogError("Fatal Error: SoundManager not Found");
-                    }
-                }
-
-                return instance;
-            }
-        }
-
-        #endregion
-
         public AudioClip scoreNormal;
         public AudioClip scoreCombo;
 
