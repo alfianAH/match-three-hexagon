@@ -8,10 +8,17 @@ namespace Score
         public Text highScore;
         public Text currentScore;
 
+        private ScoreManager scoreManager;
+
+        private void Awake()
+        {
+            scoreManager = ScoreManager.Instance;
+        }
+
         private void Update()
         {
-            highScore.text = ScoreManager.Instance.HighScore.ToString();
-            currentScore.text = ScoreManager.Instance.CurrentScore.ToString();
+            highScore.text = scoreManager.HighScore.ToString();
+            currentScore.text = scoreManager.CurrentScore.ToString();
         }
 
         /// <summary>

@@ -7,9 +7,16 @@ namespace GamePlay
     {
         public Text time;
 
+        private TimeManager timeManager;
+
+        private void Awake()
+        {
+            timeManager = TimeManager.Instance;
+        }
+
         private void Update()
         {
-            time.text = GetTimeString(TimeManager.Instance.GetRemainingTime() + 1);
+            time.text = GetTimeString(timeManager.GetRemainingTime() + 1);
         }
     
         /// <summary>

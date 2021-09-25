@@ -6,7 +6,13 @@ namespace GamePlay
     {
         public int duration;
 
+        private GameFlowManager gameFlowManager;
         private float time;
+
+        private void Awake()
+        {
+            gameFlowManager = GameFlowManager.Instance;
+        }
 
         private void Start()
         {
@@ -15,11 +21,11 @@ namespace GamePlay
 
         private void Update()
         {
-            if(GameFlowManager.Instance.IsGameOver) return;
+            if(gameFlowManager.IsGameOver) return;
 
             if (time > duration)
             {
-                GameFlowManager.Instance.GameOver();
+                gameFlowManager.GameOver();
                 return;
             }
 
