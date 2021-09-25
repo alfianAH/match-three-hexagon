@@ -78,6 +78,8 @@ public class TileController : MonoBehaviour
                 if(GetAllAdjacentTiles().Contains(previousSelected))
                 {
                     TileController otherTile = previousSelected;
+                    previousSelected.Deselect();
+                    
                     // Swap tile
                     SwapTile(otherTile, () =>
                     {
